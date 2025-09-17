@@ -6,20 +6,37 @@ const cors = require("cors");
 const app = express();
 
 const corsOptions = {
-  origin: "http://localhost:5173", // Your frontend URL and port
+  origin: "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   optionsSuccessStatus: 204,
 };
 
-app.use(cors(corsOptions)); // Automatically handles OPTIONS preflight requests
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
-const JWT_SECRET = "your_jwt_secret_key"; // Use env vars in production
+const JWT_SECRET = "your_jwt_secret_key";
 
-// In-memory user store: { email, passwordHash, tenantId, role, name }
-const users = [];
+const adminPasswordHash = bcrypt.hashSync("adminpassword", 10);
+const superAdminPasswordHash = bcrypt.hashSync("supersecret", 10);
+
+const users = [
+  {
+    tenantId: "global",
+    email: "superadmin@example.com",
+    passwordHash: superAdminPasswordHash,
+    role: "superadmin",
+    name: "Super Admin",
+  },
+  {
+    tenantId: "tenant1",
+    email: "admin1@tenant1.com",
+    passwordHash: adminPasswordHash,
+    role: "admin",
+    name: "Tenant Admin",
+  },
+];
 
 // Signup route
 app.post("/api/auth/signup", async (req, res) => {
